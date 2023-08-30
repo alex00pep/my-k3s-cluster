@@ -1,0 +1,106 @@
+---
+
+- name: Playbook to install the necessary things to run k8s on Raspberry PIs
+  hosts: raspis
+  become: yes
+  gather_facts: no
+  
+  tasks:
+    - name: Update repositories cache and upgrade system
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+        cache_valid_time: 3600
+        autoclean: yes
+        autoremove: yes
+
+    - name: Check if a reboot is needed
+      register: reboot_required_file
+      stat:
+        path: /var/run/reboot-required
+        get_md5: no
+
+    - name: Reboot if needed
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+    - name: Install vim and aptitude
+      ansible.builtin.apt:
+        pkg:
+          - vim
+          - aptitude
+
+    - name: Create Aptitude config directory
+      ansible.builtin.file:
+        path: /root/.aptitude/
+        state: directory
+        recurse: yes
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Configure Aptitude
+      ansible.builtin.copy:
+        content: |
+          aptitude "";
+          aptitude::Keep-Unused-Pattern "";
+          aptitude::Delete-Unused-Pattern "";
+          aptitude::UI "";
+          aptitude::UI::Prompt-On-Exit "false";
+          aptitude::UI::Default-Grouping "task,status";
+          aptitude::AutoClean-After-Update "true";
+          aptitude::Clean-After-Install "true";
+          aptitude::Forget-New-On-Update "true";
+        dest: /root/.aptitude/config
+        backup: yes
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Modify ls alias
+      ansible.builtin.lineinfile:
+        path: /home/pi/.bashrc
+        backup: yes
+        regexp: '^    alias ls=''ls --color=auto''$'
+        line: '    alias ls=''ls --color=auto -lahpG'''
+
+  
+- include_tasks: cmdline.yml
+  vars:
+    key: cgroup_enable
+    value: memory
+    update: false
+    # will add the argument if the key-value-pair doesn't exist
+
+- include_tasks: cmdline.yml
+  vars:
+    key: cgroup_enable
+    value: cpu
+    update: false
+
+- include_tasks: cmdline.yml
+  vars:
+    key: cgroup_memory
+    value: 1
+    update: true
+    # will replace the value of the first matching key, if found;
+    # will add it if it's not found
+
+# The following examples need the updated version from August 2023:
+
+- include_tasks: cmdline.yml
+  vars:
+    key: quiet
+    # will add key without "=" and without value if not present
+
+- include_tasks: cmdline.yml
+  vars:
+    key: quiet
+    remove: true
+    # will remove all matching keys
