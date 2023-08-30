@@ -46,8 +46,11 @@ source k8s-cluster-workers.bash
 Saving file to: /workspace/kubeconfig
 
 Test your cluster with:
+```bash
 export KUBECONFIG=/workspace/kubeconfig
 kubectl config use-context default
 kubectl get node -o wide 
+```
+
 
 ## Voila!
