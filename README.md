@@ -1,5 +1,5 @@
 # My K8s cluster - Automated K8s setup on RaspberryPi
-Kubernetes cluster setup and cluster-apps installation using Helm charts
+Kubernetes cluster setup on Raspberry Pi
 
 
 ## Step 1: Update your local file inventory file.
