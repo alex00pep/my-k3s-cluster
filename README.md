@@ -1,4 +1,4 @@
-# My K8s cluster - Automated K8s setup on RaspberryPi
+# My K3s cluster - Automated K3s setup on RaspberryPi
 Kubernetes cluster setup on Raspberry Pi
 
 
