@@ -6,5 +6,11 @@
 
 # https://medium.com/karlmax-berlin/how-to-install-kubernetes-on-raspberry-pi-53b4ce300b58
 
-export MASTER=devnode1.local
-k3sup install --host $MASTER --user pi
+source  <(cat inventory  | python py-ini-parser.py)
+
+export MASTER=${masters[host1]}
+for worker in "${nodes[@]}";
+do
+    k3sup join --host $worker --server-host $MASTER --user pi
+done
+

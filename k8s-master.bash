@@ -6,12 +6,12 @@
 
 # https://medium.com/karlmax-berlin/how-to-install-kubernetes-on-raspberry-pi-53b4ce300b58
 
-export MASTER=devnode1.local
-export WORKER1=rpi-pn3.local
-export WORKER2=rpipn4.local
-
-k3sup join --host $WORKER1 --server-host $MASTER --user pi
-k3sup join --host $WORKER2 --server-host $MASTER --user pi
+source  <(cat inventory  | python py-ini-parser.py)
 
 
-arkade install openfaas
+for dst in "${masters[@]}";
+do
+    
+    k3sup install --host $dst --user pi
+done
+

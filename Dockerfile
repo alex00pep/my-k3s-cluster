@@ -1,7 +1,7 @@
 FROM alpine/ansible
 ENV ANSIBLE_VERSION 2.9.17
 
-RUN apk --no-cache add --update openssh curl sudo && \
+RUN apk --no-cache add --update openssh curl sudo sshpass && \
     rm -rf /var/cache/apk/*
 
 

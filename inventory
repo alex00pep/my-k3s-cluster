@@ -1,3 +1,7 @@
-devnode1.local
-rpi-pn3.local
-rpipn4.local
+
+[masters]
+host1=devnode1.local
+
+[nodes]
+host1=rpi-pn3.local
+host2=rpipn4.local

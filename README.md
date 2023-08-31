@@ -19,28 +19,28 @@ docker run -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansi
 docker run -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
 ```
 
-## Step 2: Copy SSH keys to Master and Worker appliances
+## Step 2: Copy SSH keys to Master and Worker nodes
 The RSA key files are pointed at: ~/.ssh/id_rsa 
 ```bash
-source copy-ssh-key.bash ~/.ssh/id_rsa
+source copy-ssh-key.bash
 
 
-# If above line does not work, then use:
+# If above line does not work, then use command below per host:
 ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 ``` 
 
 ## Step 3: Modify the file /boot/cmdline.txt in all cluter nodes
 In file /boot/cmdline.txt add cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 into the end of the file.
-Login via SSH, do the modification shown below and reboot
+Run comman shown below and reboot the Pi's
 
 ```bash
 source setup_kernel.bash
 ```
 
-## Step 4: Update your master node name in the Create the Master and worker instances for the K8s cluster
+## Step 4: Update your master node name in the create the Master and Node instances for the K8s cluster
 ```bash
-source k8s-cluster-master.bash
-source k8s-cluster-workers.bash
+source k3s-master.bash
+source k3s-workers.bash
 ```
 ## Step 5: Work in your cluster and inspect the nodes
 Saving file to: /workspace/kubeconfig
@@ -53,4 +53,17 @@ kubectl get node -o wide
 ```
 
 
-## Voila!
+
+
+## Uninstalling Servers
+To uninstall K3s from a server node, run:
+
+```bash
+/usr/local/bin/k3s-uninstall.sh
+```
+
+## Uninstalling Agents
+To uninstall K3s from an agent node, run:
+```bash
+/usr/local/bin/k3s-agent-uninstall.sh
+```
