@@ -3,11 +3,17 @@ Kubernetes cluster setup and cluster-apps installation using Helm charts
 
 
 ## Step 1: Update your local file inventory file.
-The inventory file should contain all your Raspberry Pi's hostnames, one per line
+The inventory file should contain all your Raspberry Pi's hostnames, one per line. If the file contains names, use the line below to resolve to Ip addresses.
+
+```bash
+source resolve-names.bash
+```
 ## Step 2: Use an isolated container based on Ansible as your management station
 ```bash
 docker build --pull --rm -f "Dockerfile" -t ansiblecontainer:latest "."
 ```
+
+
 
 ```cmd
 # Command prompt (Windows)
@@ -37,7 +43,7 @@ Run comman shown below and reboot the Pi's
 source setup_kernel.bash
 ```
 
-## Step 4: Update your master node name in the create the Master and Node instances for the K8s cluster
+## Step 4: Create the Master and Node instances for the K3s cluster
 ```bash
 source k3s-master.bash
 source k3s-workers.bash
@@ -49,11 +55,11 @@ Test your cluster with:
 ```bash
 export KUBECONFIG=/workspace/kubeconfig
 kubectl config use-context default
-kubectl get node -o wide 
+kubectl get node -o wide
 ```
+![image info](k3s-ready.PNG)
 
-
-
+Yours will be different.
 
 ## Uninstalling Servers
 To uninstall K3s from a server node, run:

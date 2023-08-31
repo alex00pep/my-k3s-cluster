@@ -2,20 +2,6 @@
 
 source  <(cat inventory  | python py-ini-parser.py)
 
-# Check if SSH Agent is running. 
-echo "SSH Agent is running: "
-eval "$(ssh-agent -s)"
-# Add the Keys to SSH Agent. 
-ssh-add $2
-# Verify Keys Added to SSH Agent.
-ssh-add -l
-
-
-
-# Grab the password
-#
-IFS= read -rsp "Pi password: " sshpass && echo
-
 # Generate SSH keys if not found 
 #
 if [[ ! -f "$HOME/.ssh/id_rsa" ]] || [[ ! -f "$HOME/.ssh/id_rsa.pub" ]]
@@ -24,6 +10,19 @@ then
     rm -f "$HOME/.ssh/id_rsa" "$HOME/.ssh/id_rsa.pub"
     ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa" -P ""
 fi
+
+
+# Check if SSH Agent is running. 
+echo "SSH Agent is running: "
+eval "$(ssh-agent -s)"
+# Add the Keys to SSH Agent. 
+ssh-add "$HOME/.ssh/id_rsa"
+# Verify Keys Added to SSH Agent.
+ssh-add -l
+
+# Grab the password
+#
+IFS= read -rsp "Pi password: " sshpass && echo
 
 for dst in "${masters[@]}" "${nodes[@]}";
 do

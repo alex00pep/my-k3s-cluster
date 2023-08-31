@@ -10,8 +10,10 @@ source  <(cat inventory  | python py-ini-parser.py)
 
 
 for dst in "${masters[@]}";
-do
-    
-    k3sup install --host $dst --user pi
+do    
+    k3sup install --ip $dst --user pi
+    k3sup ready \
+        --context default \
+        --kubeconfig ./kubeconfig
 done
 

@@ -8,9 +8,9 @@
 
 source  <(cat inventory  | python py-ini-parser.py)
 
-export MASTER=${masters[host1]}
+MASTER=${masters[host1]}
 for worker in "${nodes[@]}";
 do
-    k3sup join --host $worker --server-host $MASTER --user pi
+    k3sup join --ip $worker --server-ip $MASTER --user pi
 done
 

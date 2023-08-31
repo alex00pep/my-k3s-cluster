@@ -1,7 +1,6 @@
 
 [masters]
-host1=devnode1.local
+host1=192.168.0.186
 
 [nodes]
-host1=rpi-pn3.local
-host2=rpipn4.local
+host2=192.168.0.123
