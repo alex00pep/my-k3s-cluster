@@ -48,24 +48,52 @@ source setup_kernel.bash
 source k3s-master.bash
 source k3s-workers.bash
 ```
-## Step 5: Work in your cluster and inspect the nodes
+## Step 5: Check the installation and the cluster nodes
 Saving file to: /workspace/kubeconfig
 
 Test your cluster with:
 ```bash
 export KUBECONFIG=/workspace/kubeconfig
 kubectl config use-context default
-kubectl get node -o wide
+kubectl cluster-info
+kubectl get all -A -o wide
+kubectl get endpoints -A
+kubectl top pod --containers -A
+kubectl get nodes -o wide
+
+k3s check-config  # Run this on the master only
+sudo k3s crictl ps -a # Run it on the master server
 ```
+
 ![image info](k3s-ready.PNG)
 
 Yours will be different.
+
+
+## Step 6: Run an Nginx cluster of 2 pods
+```bash
+source k3s-nginx.bash
+
+# Check the DNS for service is working inside the cluster
+kubectl run cluster-tester -it --rm --restart=Never --image=busybox:1.28
+#Or: kubectl run cluster-tester -it --rm --restart=Never --image=gcr.io/kubernetes-e2e-test-images/dnsutils:1.3
+nslookup kubernetes.default
+nslookup hello-svc.default.svc.cluster.local
+wget -qO- hello-svc.default.svc.cluster.local
+exit
+
+# Cleaning everything
+kubectl -n k3s delete -f nginx.yaml
+
+```
+
 
 ## Uninstalling Servers
 To uninstall K3s from a server node, run:
 
 ```bash
 /usr/local/bin/k3s-uninstall.sh
+sudo rm -rf /var/lib/rancher/k3s/ /etc/rancher/k3s
 ```
 
 ## Uninstalling Agents
