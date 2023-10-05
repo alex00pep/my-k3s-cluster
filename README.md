@@ -37,7 +37,7 @@ ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 
 ## Step 3: Modify the file /boot/cmdline.txt in all cluter nodes
 In file /boot/cmdline.txt add cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 into the end of the file.
-Run comman shown below and reboot the Pi's
+Run command shown below and reboot the Pi's
 
 ```bash
 source setup_kernel.bash
