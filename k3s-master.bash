@@ -8,10 +8,14 @@
 
 source  <(cat inventory  | python py-ini-parser.py)
 
-
+user=$1
+if [[ -z "$user" ]]; then
+    echo "Please specify a user"
+    return
+fi
 for dst in "${masters[@]}";
 do    
-    k3sup install --ip $dst --user pi
+    k3sup install --ip $dst --user $user
     k3sup ready \
         --context default \
         --kubeconfig ./kubeconfig

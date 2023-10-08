@@ -1,5 +1,5 @@
 #!/bin/bash
-
+cp inventory inventory.orig
 source  <(cat inventory  | python py-ini-parser.py)
 
 for host in "${masters[@]}" "${nodes[@]}";

@@ -8,9 +8,14 @@
 
 source  <(cat inventory  | python py-ini-parser.py)
 
+user=$1
+if [[ -z "$user" ]]; then
+    echo "Please specify a user"
+    return
+fi
 MASTER=${masters[host1]}
 for worker in "${nodes[@]}";
 do
-    k3sup join --ip $worker --server-ip $MASTER --user pi
+    k3sup join --ip $worker --server-ip $MASTER --user $user
 done
 

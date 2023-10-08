@@ -11,7 +11,7 @@ spec:
   selector:
     matchLabels:
       app: hello-world
-  replicas: 2
+  replicas: 3
   minReadySeconds: 10
   strategy:
     type: RollingUpdate
@@ -28,6 +28,12 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
 
 ---
 apiVersion: v1
