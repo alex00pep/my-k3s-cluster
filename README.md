@@ -70,7 +70,14 @@ sudo k3s crictl ps -a # Run it on the master server
 Yours will be different.
 
 
-## Step 6: Run an Nginx cluster of 3 replicas
+## Step 6: Install Kubernetes Dashboard
+```bash
+source k3s-dashboard.bash
+```
+Access the dashboard: https://127.0.0.1:8443/
+
+
+## Step 7: Run an Nginx cluster of 3 replicas
 ```bash
 source k3s-nginx.bash
 
@@ -94,12 +101,6 @@ https://<your_pi_node>
 ```bash
 kubectl -n k3s delete -f nginx.yaml
 ```
-
-## Step 7: Install Kubernetes Dashboard
-```bash
-source k3s-dashboard.bash
-```
-Access the dashboard: https://127.0.0.1:8443/
 
 ## Uninstalling K3s cluster
 To uninstall K3s from all servers and nodes, run:
