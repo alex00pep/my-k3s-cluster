@@ -17,7 +17,7 @@ done
 
 for dst in "${nodes[@]}";
 do
-    
+    ssh-keyscan -H -t rsa ${dst} >> ~/.ssh/known_hosts
     ssh $user@$dst '/usr/local/bin/k3s-agent-uninstall.sh || true'
     
 done

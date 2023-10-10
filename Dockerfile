@@ -8,5 +8,7 @@ RUN apk --no-cache add --update openssh curl sudo sshpass && \
 # Installing K3s and K3ssup into the management container, using Arkade
 RUN curl -sSL https://get.arkade.dev | sudo sh
 RUN arkade get kubectl; sudo install $HOME/.arkade/bin/kubectl /usr/local/bin/
+RUN arkade get helm; sudo install $HOME/.arkade/bin/helm /usr/local/bin/
 RUN arkade get k3sup; sudo install $HOME/.arkade/bin/k3sup /usr/local/bin/
 RUN ssh-keygen -b 4086 -t rsa -f $HOME/.ssh/id_rsa -q -N ""
+RUN echo 'source <(kubectl completion bash)' >> $HOME/.bashrc

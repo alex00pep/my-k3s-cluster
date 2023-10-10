@@ -17,16 +17,16 @@ docker build --pull --rm -f "Dockerfile" -t ansiblecontainer:latest "."
 
 ```cmd
 # Command prompt (Windows)
-docker run -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansiblecontainer
+docker run -p 8443:8443 -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansiblecontainer
 ```
 
 ```bash
-# Bash
-docker run -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
+# Bash (Linux)
+docker run -p 8443:8443 -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
 ```
 
 ## Step 2: Copy SSH keys to Master and Worker nodes
-The RSA key files are pointed at: ~/.ssh/id_rsa 
+The RSA key files are pointed at: ~/.ssh/id_rsa
 ```bash
 source copy-ssh-key.bash pi
 
@@ -35,7 +35,7 @@ source copy-ssh-key.bash pi
 ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 ``` 
 
-## Step 3: Modify the file /boot/cmdline.txt in all cluter nodes
+## Step 3: Modify the file /boot/cmdline.txt in all Pis
 In file /boot/cmdline.txt add cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 into the end of the file.
 Run command shown below and reboot all the Pis
 
@@ -49,11 +49,11 @@ source k3s-master.bash pi
 source k3s-workers.bash pi
 ```
 ## Step 5: Check the installation and the cluster nodes
-Saving file to: /workspace/kubeconfig
+Saving KUBECONFIG file to: /workspace/kubeconfig
 
 Test your cluster with:
 ```bash
-export KUBECONFIG=/workspace/kubeconfig
+export KUBECONFIG=`pwd`/kubeconfig
 kubectl config use-context default
 kubectl cluster-info
 kubectl get nodes -o wide
@@ -95,8 +95,13 @@ https://<your_pi_node>
 kubectl -n k3s delete -f nginx.yaml
 ```
 
+## Step 7: Install Kubernetes Dashboard
+```bash
+source k3s-dashboard.bash
+```
+Access the dashboard: https://127.0.0.1:8443/
 
-## Uninstalling Servers
+## Uninstalling K3s cluster
 To uninstall K3s from all servers and nodes, run:
 
 ```bash

@@ -1,5 +1,8 @@
 #!/bin/bash
+# Configure kubectl autocomplete. If kubectl autocomplete is not set yet:
+source <(kubectl completion bash)
 
+# Extract the master and nodes arrays from the inventory file
 source  <(cat inventory  | python py-ini-parser.py)
 
 # Generate SSH keys if not found 
