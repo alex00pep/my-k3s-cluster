@@ -5,7 +5,7 @@
   - [k9s](#k9s)
   
 # Overview
-kube tools container contains contains software's like kubectl, helm, octant which helps to work with a kubernetes cluster.
+kube tools container contains software's like kubectl, helm, octant which helps to work with a kubernetes cluster.
 
 # Instructions
 

@@ -67,13 +67,9 @@ sudo k3s check-config  # Run this on the master server only
 sudo k3s crictl ps -a # Run it on the master server
 ```
 
-## Step 7: Run several kubernetes tools 
-1. Octant as web kubernetes console.
-```bash
-cp ./kubeconfig kube-tools/
-cd kube-tools
-docker-compose -f docker-compose-octant.yml up -d --build
-```
+## Step 7: Run some kubernetes tools 
+Open the kube-tools folder and follow the instructions
+
 
 ## Uninstalling K3s cluster
 To uninstall K3s from all servers and nodes, run:
@@ -81,3 +77,12 @@ To uninstall K3s from all servers and nodes, run:
 ```bash
 ansible-playbook k3s-ansible-master/reset.yml -i inventory/hosts.ini
 ```
+
+# Special thanks to:
+[Entechlog](https://www.entechlog.com/blog/general/how-to-set-up-kubernetes-cluster-with-raspberry-pi/#prerequisite)
+
+[K3s](https://k3s.io/)
+
+[k3sup](https://github.com/k3s-io/k3sup)
+
+[K3s-ansible](https://github.com/k3s-io/k3s-ansible)
