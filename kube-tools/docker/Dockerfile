@@ -50,7 +50,7 @@ RUN sudo mv /tmp/k9s /usr/local/bin
 # RUN pip install --no-cache-dir -r requirements.txt
 
 # Create pi user 
-RUN useradd -rm -d /home/pi -s /bin/bash -g pi -G sudo -u 1001 pi 
+RUN groupadd --gid 999 pi && useradd -rm -d /home/pi -s /bin/bash -g pi -G sudo -u 1001 pi 
 USER pi
 # WORKDIR /home/pi
 

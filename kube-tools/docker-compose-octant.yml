@@ -15,9 +15,9 @@ services:
       - -c 
       - |
         echo "Launching octant"
-        KUBECONFIG=./.kube/config OCTANT_LISTENER_ADDR=0.0.0.0:7777 octant --disable-open-browser
+        KUBECONFIG=/.kube/config OCTANT_LISTENER_ADDR=0.0.0.0:7777 octant --disable-open-browser
     restart: unless-stopped
     ports:
       - "7777:7777"
     volumes:
-      - ./kubeconfig:~/.kube/config
+      - ./kubeconfig:/.kube/config

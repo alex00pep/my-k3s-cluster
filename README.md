@@ -53,6 +53,7 @@ Saving KUBECONFIG file to: /workspace/kubeconfig
 Test your cluster with:
 ```bash
 source get-k3s-token.bash <MASTER_IP> pi
+# Follow the instructions of the script in the output
 
 export KUBECONFIG=/workspace/kubeconfig
 kubectl config use-context default
@@ -66,9 +67,13 @@ sudo k3s check-config  # Run this on the master server only
 sudo k3s crictl ps -a # Run it on the master server
 ```
 
-Yours will be different.
-
-
+## Step 7: Run several kubernetes tools 
+1. Octant as web kubernetes console.
+```bash
+cp ./kubeconfig kube-tools/
+cd kube-tools
+docker-compose -f docker-compose-octant.yml up -d --build
+```
 
 ## Uninstalling K3s cluster
 To uninstall K3s from all servers and nodes, run:
