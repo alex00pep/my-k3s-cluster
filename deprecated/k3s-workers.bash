@@ -13,8 +13,8 @@ if [[ -z "$user" ]]; then
     echo "Please specify a user"
     return
 fi
-MASTER=${masters[host1]}
-for worker in "${nodes[@]}";
+MASTER=${master[host1]}
+for worker in "${node[@]}";
 do
     k3sup join --ip $worker --server-ip $MASTER --user $user
 done

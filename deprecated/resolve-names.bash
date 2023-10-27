@@ -1,8 +1,8 @@
 #!/bin/bash
 cp inventory inventory.orig
-source  <(cat inventory  | python py-ini-parser.py)
+source <(cat inventory  | python py-ini-parser.py)
 
-for host in "${masters[@]}" "${nodes[@]}";
+for host in "${master[@]}" "${node[@]}";
 do
    result=$(nslookup "$host" 2> /dev/null | awk '/Name:/{val=$NF;flag=1;next} /Address:/ && flag{print $NF,val;val=""}')
    all_ips=${result}

@@ -2,8 +2,17 @@
 # Configure kubectl autocomplete. If kubectl autocomplete is not set yet:
 source <(kubectl completion bash)
 
-# Extract the master and nodes arrays from the inventory file
-source  <(cat inventory  | python py-ini-parser.py)
+# Make the hosts available on the global namespace for the script
+source <(cat inventory  | python py-ini-parser.py)
+
+
+for dst in "${master[@]}" "${node[@]}";
+do
+    # Overcome the unknown SSH Host fingerprint issue, by deleting the already existing keys
+    ssh-keygen -R ${dst} > /dev/null 2>&1 
+    # And scan the remote host for its new SSH fingerprint
+    ssh-keyscan -H -t rsa ${dst} >> $HOME/.ssh/known_hosts
+done
 
 # Generate SSH keys if not found 
 #
@@ -18,10 +27,11 @@ fi
 # Check if SSH Agent is running. 
 echo "SSH Agent is running: "
 eval "$(ssh-agent -s)"
-# Add the SSH Keys to SSH Agent. 
+echo "Add the SSH Keys to SSH Agent"
 ssh-add "$HOME/.ssh/id_rsa"
 # Verify Keys Added to SSH Agent.
 ssh-add -l
+echo "**********SSH Keys Added to SSH Agent***********"
 
 # Grab the password
 #
@@ -32,11 +42,9 @@ if [[ -z "$user" ]]; then
 fi
 IFS= read -rsp "${user}'s password: " sshpass && echo
 
-for dst in "${masters[@]}" "${nodes[@]}";
+# Copy the SSH keys
+for dst in "${master[@]}" "${node[@]}";
 do
-    # Overcome the unknown SSH Host fingerprint issue
-    ssh-keygen -R ${dst}
-    ssh-keyscan -H -t rsa ${dst} >> ~/.ssh/known_hosts
     # Using the password we entered at the beginning, copy the keys everywhere
     SSHPASS=$sshpass sshpass -e -v -P "password" ssh-copy-id -i "$HOME/.ssh/id_rsa" -f ${user}@${dst}
 done

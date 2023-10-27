@@ -13,15 +13,15 @@ if [[ -z "$user" ]]; then
     echo "Please specify a user"
     return
 fi
-for dst in "${masters[@]}";
+for dst in "${master[@]}";
 do    
-    # Note: the --write-kubeconfig-mode 644 option is needed to avoid kubectl permission denied error later on.
-    # Note: --ipsec use to enforce K3s to use Flannel as alightweight network fabric that implements the Kubernetes Container Network Interface (CNI)
+    # Note: the --write-kubeconfig-mode 644 option is passed to Rancher K3s installer is needed to avoid kubectl permission denied error later on.
+    # Note: --ipsec use to enforce Rancher K3s to use Flannel as alightweight network fabric that implements the Kubernetes Container Network Interface (CNI)
     k3sup install --ip $dst --user $user --k3s-extra-args '--write-kubeconfig-mode 644'
     
 
     k3sup ready \
         --context default \
-        --kubeconfig ./kubeconfig
+        --kubeconfig ${HOME}/.kube/config
 done
 

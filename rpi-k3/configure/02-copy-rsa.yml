@@ -1,0 +1,72 @@
+---
+# Reference docs: https://www.middlewareinventory.com/blog/ansible-ssh-key-exchange/
+- name: Copy SSh Key into hosts from local machine
+  hosts: all
+  become: yes
+  gather_facts: no
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  tasks:
+    - name: accept new hosts' ssh fingerprints
+      tags: [ ssh, fingerprints ]
+      shell: ssh-keyscan -H {{ ansible_ssh_host }} >> /home/{{ ansible_user }}/.ssh/known_hosts  
+    - name: Delete all SSH Known Hosts and authorized SSH keys from all nodes
+      tags: [ ssh ]
+      shell: >
+        rm -f ~/.ssh/known_hosts && rm -f ~/.ssh/authorized_keys
+        
+    - name: Authorize local SSH Key into remote hosts
+      tags: [ ssh ]
+      authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+        key: "{{ lookup('file',  lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+        manage_dir: yes
+  
+- name: Create local directory for SSH Key
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Create local directory ./buffer
+      file:
+        path: "{{ playbook_dir | dirname | dirname }}/buffer"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        mode: "u=rwx,g=rx,o="
+
+
+- name: Exchange Keys between servers remote master and nodes
+  hosts: all
+  tasks:
+    - name: SSH KeyGen command for each node
+      tags: [ ssh ]
+      shell: > 
+        ssh-keygen -q -b 4096 -t rsa -N "" -C "creating SSH" -f ~/.ssh/id_rsa
+        creates="~/.ssh/id_rsa"
+
+    - name: Fetch the SSH Key from each node and master to local machine
+      tags: [ ssh ]
+      fetch: 
+        src: "~/.ssh/id_rsa.pub"
+        dest: "{{ playbook_dir | dirname | dirname }}/buffer/{{ansible_ssh_host}}-id_rsa.pub"
+        flat: yes
+      
+
+    - name: Copy each others SSH public key
+      tags: [ ssh ]
+      authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+        key: "{{ lookup('file','{{ playbook_dir | dirname | dirname }}/buffer/{{item}}-id_rsa.pub')}}"
+      when: " item != ansible_ssh_host "
+      with_items:
+        - "{{ groups['all'] }}"    
+
+- name: Delete all SSH public key from local
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Delete all SSH pub key from local
+      tags: [ ssh ]
+      shell: > 
+        rm -rf "{{ playbook_dir | dirname | dirname }}/buffer"

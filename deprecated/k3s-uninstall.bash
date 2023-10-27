@@ -9,15 +9,15 @@ if [[ -z "$user" ]]; then
 fi
 
 
-for dst in "${masters[@]}";
+for dst in "${master[@]}";
 do
     ssh $user@$dst '/usr/local/bin/k3s-uninstall.sh;sudo rm -rf /var/lib/rancher/k3s/ /etc/rancher/k3s || true'
     
 done
 
-for dst in "${nodes[@]}";
+for dst in "${node[@]}";
 do
-    ssh-keyscan -H -t rsa ${dst} >> ~/.ssh/known_hosts
+    ssh-keyscan -H -t rsa ${dst} >> $HOME/.ssh/known_hosts
     ssh $user@$dst '/usr/local/bin/k3s-agent-uninstall.sh || true'
     
 done

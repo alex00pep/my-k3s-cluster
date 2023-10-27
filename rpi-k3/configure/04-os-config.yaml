@@ -1,0 +1,98 @@
+# Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
+- name: "Maintenance scripts to delete logs, updates and dist upgrade"
+  hosts: k3s_cluster
+  gather_facts: no
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Update repositories cache and upgrade system
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+        cache_valid_time: 3600
+        autoclean: yes
+        autoremove: yes
+      tags: [ upgrade ]
+    - name: Check if a reboot is needed
+      register: reboot_required_file
+      stat:
+        path: /var/run/reboot-required
+        get_md5: no
+      tags: [ upgrade ]
+    - name: Reboot if needed
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+      tags: [ upgrade ]
+
+    - name: Reboot mandatory
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      tags: [ reboot ]
+
+    - name: Disable Root Login
+      lineinfile:
+        dest=/etc/ssh/sshd_config
+        regexp='^PermitRootLogin'
+        line="PermitRootLogin no"
+        state=present
+        backup=yes
+      tags: [ security ]
+      
+    - name: "Setup script to delete logs, update repo list and dist upgrade"
+      copy:
+        dest: /usr/local/bin/raspi-clean-and-update.sh
+        content: |
+          set -x
+          find /var/log -name '*.gz' | xargs rm -f {}
+          find /var/log -type f | xargs cat /dev/null > {}
+          apt update -y
+          apt autoremove
+          apt upgrade -y
+          apt dist-upgrade -y
+          if [ -f /var/run/reboot-required ]; then
+            echo "Reboot required"
+            /sbin/shutdown -P now
+          fi
+      tags: [ cron ]
+    - name: "Every month at 1am launch raspi-clean-and-update.sh"
+      cron:
+        name: "Launch raspi-clean-and-update.sh"
+        minute: "0"
+        hour: "1"
+        day: 1
+        user: root
+        job: "/bin/sh /usr/local/bin/raspi-clean-and-update.sh"
+        state: present
+      tags: [ cron ]
+    - name: "Shutdown wifi at startup time"
+      cron:
+        name: "Shutdown wifi"
+        special_time: reboot
+        user: root
+        job: "ifdown wlan0; ifconfig wlan0 down"
+        state: present
+      tags: [ cron ]
+
+    - name: "shutdown at 2am"
+      cron:
+        name: "Shutdown at 2am"
+        minute: "0"
+        hour: "2"
+        user: root
+        job: "/sbin/shutdown -P now"
+        state: absent
+      tags: [ cron ]
+
+

@@ -1,2 +1,5 @@
 kubeconfig
-inventory.orig
+./kube/config
+inventory/hosts.ini
+k3s-ansible-master/
+buffer/

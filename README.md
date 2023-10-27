@@ -2,58 +2,59 @@
 Kubernetes cluster setup on Raspberry Pi
 
 
-## Step 1: Update your local file inventory file.
-The inventory file should contain all your Raspberry Pi's hostnames, one per line. If the file contains names, use the line below to resolve to Ip addresses.
-
-```bash
-source resolve-names.bash
-```
-## Step 2: Use an isolated container based on Ansible as your management station
+## Step 1: Use an isolated container based on Ansible as your management station
 ```bash
 docker build --pull --rm -f "Dockerfile" -t ansiblecontainer:latest "."
 ```
 
 
-
 ```cmd
 # Command prompt (Windows)
-docker run -p 8443:8443 -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansiblecontainer
+docker run -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansiblecontainer
 ```
 
 ```bash
 # Bash (Linux)
-docker run -p 8443:8443 -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
+docker run -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
 ```
-
-## Step 2: Copy SSH keys to Master and Worker nodes
-The RSA key files are pointed at: ~/.ssh/id_rsa
+## Step 2: Copy the sample inventory and dit inventory/hosts.ini with the IP addresses you need, line in the following format:
 ```bash
-source copy-ssh-key.bash pi
+cp -R inventory/sample.ini inventory/hosts.ini
 
 
-# If above line does not work, then use command below per host:
+```
+## Step 3: Copy SSH keys to Master and Worker nodes as authorized_keys
+The RSA key files will be located at: ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
+```bash
+ansible-playbook rpi-k3/configure/01-generate-rsa.yml -i inventory/hosts.ini
+ansible-playbook rpi-k3/configure/02-copy-rsa.yml -i inventory/hosts.ini --ask-pass
+
+# Then ping your nodes
+ansible -i inventory/hosts.ini -m ping all
+
+# If above lines do not work, then use command below per host:
 ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 ``` 
-
-## Step 3: Modify the file /boot/cmdline.txt in all Pis
-In file /boot/cmdline.txt add cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 into the end of the file.
-Run command shown below and reboot all the Pis
-
+## Step 4: Upgrade Pis with Ansible playbook
 ```bash
-source setup_kernel.bash pi
+ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/hosts.ini -t upgrade
 ```
 
-## Step 4: Create the Master and Node instances for the K3s cluster, passing username as an argument
+## Step 5: Install K3s using the following k3-ansible project
 ```bash
-source k3s-master.bash pi
-source k3s-workers.bash pi
+git clone https://github.com/k3s-io/k3s-ansible.git
+ansible-playbook k3s-ansible-master/site.yml -i inventory/hosts.ini
 ```
-## Step 5: Check the installation and the cluster nodes
+
+## Step 6: Check the installation and the cluster nodes
 Saving KUBECONFIG file to: /workspace/kubeconfig
+
 
 Test your cluster with:
 ```bash
-export KUBECONFIG=`pwd`/kubeconfig
+source get-k3s-token.bash <MASTER_IP> pi
+
+export KUBECONFIG=/workspace/kubeconfig
 kubectl config use-context default
 kubectl cluster-info
 kubectl get nodes -o wide
@@ -65,46 +66,13 @@ sudo k3s check-config  # Run this on the master server only
 sudo k3s crictl ps -a # Run it on the master server
 ```
 
-![image info](k3s-ready.PNG)
-
 Yours will be different.
 
 
-## Step 6: Install Kubernetes Dashboard
-```bash
-source k3s-dashboard.bash
-```
-Access the dashboard: https://127.0.0.1:8443/
-
-
-## Step 7: Run an Nginx cluster of 3 replicas
-```bash
-source k3s-nginx.bash
-
-# Check the DNS for service is working inside the cluster
-kubectl run cluster-tester -it --rm --restart=Never --image=busybox:1.28
-#Or: kubectl run cluster-tester -it --rm --restart=Never --image=gcr.io/kubernetes-e2e-test-images/dnsutils:1.3
-nslookup kubernetes.default
-nslookup hello-svc.default.svc.cluster.local
-wget -qO- hello-svc.default.svc.cluster.local
-exit
-
-# Get Checking the NGINX webpage
-kubectl get nodes -o wide
-```
-
-Open your browser and navigate to:
-
-https://<your_pi_node>
-
-# Cleaning everything
-```bash
-kubectl -n k3s delete -f nginx.yaml
-```
 
 ## Uninstalling K3s cluster
 To uninstall K3s from all servers and nodes, run:
 
 ```bash
-source k3s-uninstall.bash
+ansible-playbook k3s-ansible-master/reset.yml -i inventory/hosts.ini
 ```

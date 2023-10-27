@@ -1,0 +1,6 @@
+[master]
+host1=1.1.1.1
+
+[node]
+host2=2.2.2.2
+host3=3.3.3.3
