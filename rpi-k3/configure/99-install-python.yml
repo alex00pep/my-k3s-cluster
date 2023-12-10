@@ -5,7 +5,7 @@
     - name: run apt-get update and install python3 python3-pip
       raw: "{{ item }}"
       loop:
-        - sudo apt-get update
+        - sudo apt update
         - sudo apt install -y python3 python3-pip
       become: true
 

@@ -1,6 +1,6 @@
 # Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
 - name: "Maintenance scripts to delete logs, updates and dist upgrade"
-  hosts: k3s_cluster
+  hosts: all
   gather_facts: no
   become: true
   become_user: root
@@ -57,10 +57,10 @@
           set -x
           find /var/log -name '*.gz' | xargs rm -f {}
           find /var/log -type f | xargs cat /dev/null > {}
-          apt update -y
-          apt autoremove
+          apt update -y          
           apt upgrade -y
           apt dist-upgrade -y
+          apt autoremove -y
           if [ -f /var/run/reboot-required ]; then
             echo "Reboot required"
             /sbin/shutdown -P now

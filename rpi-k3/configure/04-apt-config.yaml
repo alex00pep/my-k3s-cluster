@@ -1,0 +1,24 @@
+# Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
+- name: "Update your sources.list file to use Debian Bookworm"
+  hosts: rpi-pn3.local
+  gather_facts: no
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Update repositories list and cache
+      ansible.builtin.replace:
+        owner: root
+        path: /etc/apt/sources.list
+        regexp: (bullseye|buster)
+        replace: bookworm        
+      tags: [ upgrade ]
+    - name: Update repositories cache and upgrade system
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+        cache_valid_time: 3600
+        autoclean: yes
+        autoremove: yes
+      tags: [ upgrade ]
+    
