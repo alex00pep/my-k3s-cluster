@@ -10,12 +10,12 @@ docker build --pull --rm -f "Dockerfile" -t ansiblecontainer:latest "."
 
 ```cmd
 # Command prompt (Windows)
-docker run -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansiblecontainer
+docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host -v %cd%:/workspace ansiblecontainer
 ```
 
 ```bash
 # Bash (Linux)
-docker run -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
+docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd`:/workspace ansiblecontainer
 ```
 ## Step 2: Copy the sample inventory and dit inventory/hosts.ini with the IP addresses you need, line in the following format:
 ```bash
