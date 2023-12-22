@@ -26,10 +26,7 @@ spec:
       securityContext:
         runAsUser: 10000
         runAsGroup: 30000
-        capabilities:
-          drop: [ALL]
-          add:
-            - NET_BIND_SERVICE
+        
         
       containers:        
         - name: nginx
@@ -38,6 +35,10 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+              add:
+                - NET_BIND_SERVICE
           ports:
           - containerPort: 80
           readinessProbe:
