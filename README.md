@@ -45,7 +45,8 @@ ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/hosts.ini -t up
 git clone https://github.com/k3s-io/k3s-ansible.git
 ansible-playbook k3s-ansible-master/site.yml -i inventory/hosts.ini
 ```
-
+## Step 6 [optional]: Install Docker engine
+Follow through: 
 ## Step 6: Check the installation and the cluster nodes
 Saving KUBECONFIG file to: /workspace/kubeconfig
 
