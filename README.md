@@ -46,7 +46,7 @@ git clone https://github.com/k3s-io/k3s-ansible.git
 ansible-playbook k3s-ansible-master/site.yml -i inventory/hosts.ini
 ```
 ## Step 6 [optional]: Install Docker engine
-Follow through: 
+Follow through: https://medium.com/@life-is-short-so-enjoy-it/raspberry-pi-install-docker-by-ansible-on-arm64-debian-bookworm-6e00f336f938
 ## Step 6: Check the installation and the cluster nodes
 Saving KUBECONFIG file to: /workspace/kubeconfig
 
