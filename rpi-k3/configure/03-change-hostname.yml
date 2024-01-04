@@ -42,9 +42,9 @@
       debug: 
         msg: "ansible_fqdn is {{ ansible_fqdn }}, inventory_hostname is {{ inventory_hostname }}"
   
-#    - name: validate ansible_fqdn == inventory_hostname
-#      tags:
-#        - validate
-#      assert:
-#        that: ansible_fqdn == inventory_hostname
-#        quiet: yes
+   - name: validate ansible_fqdn == inventory_hostname
+     tags:
+       - validate
+     assert:
+       that: ansible_fqdn == inventory_hostname
+       quiet: yes

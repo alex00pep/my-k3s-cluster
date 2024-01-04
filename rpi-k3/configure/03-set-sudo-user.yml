@@ -1,0 +1,32 @@
+---
+- name: User add to sudo group
+  hosts: all
+  gather_facts: no
+  become: true
+  become_user: root    
+  become_method: su
+  tasks:
+    - name: Update repositories cache and clean old packages
+      ansible.builtin.apt:
+        update_cache: yes
+        autoclean: yes
+        autoremove: yes
+    - name: Install sudo
+      raw: "{{ item }}"
+      loop:        
+        - apt install -y sudo
+      become: true
+
+    - name: Create group sudo
+      ansible.builtin.group:
+        name: sudo
+        state: present
+
+    - name: Add sudoers users to sudo group
+      ansible.builtin.user:
+        name={{ ansible_user }}
+        group={{ ansible_user }}
+        groups=sudo
+        append=yes
+        state=present
+        create_home=yes
