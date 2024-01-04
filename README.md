@@ -12,12 +12,12 @@ ansible-galaxy collection install ansible.posix
 
 ```cmd
 # Command prompt (Windows)
-docker run -it --entrypoint=/bin/bash --rm -w /workspace -v %cd%:/workspace ansiblecontainer
+docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host -v %cd%:/workspace ansiblecontainer
 ```
 
 ```bash
 # Bash (Linux)
-docker run -it --entrypoint=/bin/bash --rm -w /workspace -v `pwd`:/workspace ansiblecontainer
+docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd`:/workspace ansiblecontainer
 ```
 ## Step 2: Generate your inventory/hosts.ini with the IP addresses you need. Also install necessary packages:
 ```bash
@@ -98,7 +98,7 @@ sudo k3s check-config  # Run this on the master server only
 sudo k3s crictl ps -a # Run it on the master server
 ```
 
-## Step 7: Run some kubernetes tools 
+## Step 7: [Optional] Run some kubernetes tools 
 Open the kube-tools folder and follow the instructions
 
 

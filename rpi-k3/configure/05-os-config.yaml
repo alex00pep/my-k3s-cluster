@@ -6,13 +6,14 @@
   become_user: root
   become_method: sudo
   tasks:
-    - name: Update repositories cache and upgrade system
+    - name: Update repositories list and upgrade system
       ansible.builtin.apt:
         update_cache: yes
         upgrade: dist
         cache_valid_time: 3600
         autoclean: yes
         autoremove: yes
+        purge: true
       tags: [ upgrade ]
     - name: Check if a reboot is needed
       register: reboot_required_file

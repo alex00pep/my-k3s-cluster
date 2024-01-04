@@ -1,0 +1,49 @@
+# Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
+- name: "Update your sources.list file to use Debian Bookworm"
+  hosts: all
+  gather_facts: no
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Update repositories list and cache to Debian Bookworm
+      ansible.builtin.replace:
+        owner: root
+        path: /etc/apt/sources.list
+        regexp: (bullseye|buster)
+        replace: bookworm        
+      tags: [ upgrade ]
+    - name: Update RaspberryPi repositories to Debian Bookworm
+      ansible.builtin.replace:
+        owner: root
+        path: /etc/apt/sources.list.d/raspi.list
+        regexp: (bullseye|buster)
+        replace: bookworm        
+      tags: [ upgrade ]
+    - name: Update repositories cache and upgrade system
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: full
+        cache_valid_time: 3600
+        autoclean: yes
+        autoremove: yes
+        purge: true
+      tags: [ upgrade ]
+    - name: Check if a reboot is needed
+      register: reboot_required_file
+      stat:
+        path: /var/run/reboot-required
+        get_md5: no
+      tags: [ upgrade ]
+    - name: Reboot if needed
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+      tags: [ upgrade ]
+    
+    

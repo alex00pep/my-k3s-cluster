@@ -1,5 +1,5 @@
 # Dockerfile
-FROM python:3.11-slim-buster
+FROM python:3.11.5-slim-bookworm
 
 WORKDIR /usr/app
 
