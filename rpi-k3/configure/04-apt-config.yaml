@@ -1,5 +1,5 @@
-# Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
-- name: "Update your sources.list file to use Debian Bookworm"
+---
+- name: "Update your sources.list file to update Debian Bookworm (NOT RECOMMENDED, instead flash a brand new boot drive with the desired distro)"
   hosts: rpi-pn3.local
   gather_facts: no
   become: true

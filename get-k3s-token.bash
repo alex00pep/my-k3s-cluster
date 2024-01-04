@@ -12,6 +12,9 @@ if [[ -z "$master_ip" ]]; then
     return
 fi
 
+mkdir -p ~/.kube
+touch ~/.kube/config
+
 master_user=$2
 if [[ -z "$master_user" ]]; then
     echo "Second argument is missing. Please specify a user"
@@ -24,6 +27,6 @@ k3sup install  \
     --skip-install \
     --host $master_ip \
     --context default \
-    --local-path /workspace/kubeconfig \
-    --ssh-key ~/.ssh/id_rsa \
-    --k3s-version v1.28.2+k3s1
+    --merge \
+    --local-path ~/.kube/config \
+    --ssh-key ~/.ssh/id_rsa
