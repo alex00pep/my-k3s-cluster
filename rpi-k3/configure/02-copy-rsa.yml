@@ -41,7 +41,7 @@
         mode: "u=rwx,g=rx,o="
 
 
-- name: Exchange Keys between servers remote master and nodes
+- name: Exchange Keys between master and nodes
   hosts: all
   tasks:
     - name: SSH KeyGen command for each node

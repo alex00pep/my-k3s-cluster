@@ -1,4 +1,4 @@
-# Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
+
 - name: "Maintenance scripts to delete logs, updates and dist upgrade"
   hosts: all
   gather_facts: no

@@ -19,9 +19,9 @@ docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host -v %cd%:
 # Bash (Linux)
 docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd`:/workspace ansiblecontainer
 ```
-## Step 2: Generate your inventory/hosts.ini with the IP addresses you need. Also install necessary packages:
+## Step 2: Generate your inventory/youhosts.ini with the IP addresses you need. Second, edit inventory/my-cluster/hosts.ini to match the system information gathered:
 ```bash
-cp -R inventory/sample.ini inventory/hosts.ini
+cp -R inventory/sample inventory/my-cluster
 ```
 Install sshpass and kubectl programs using the package manager for Linux distribution. Example for Debian and Ubuntu
 ```bash
@@ -52,15 +52,15 @@ k3sup --help
 ## Step 3: Copy SSH keys to Master and Worker nodes as authorized_keys and add the user to sudo group
 The RSA key files will be located at: ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
 ```bash
-ansible-playbook rpi-k3/configure/01-generate-rsa.yml -i inventory/hosts.ini
-ansible-playbook rpi-k3/configure/02-copy-rsa.yml -i inventory/hosts.ini --ask-pass
-ansible-playbook rpi-k3/configure/03-set-sudo.yml -i inventory/hosts.ini --ask-pass --ask-become-pass
+ansible-playbook rpi-k3/configure/01-generate-rsa.yml -i inventory/my-cluster/hosts.ini
+ansible-playbook rpi-k3/configure/02-copy-rsa.yml -i inventory/my-cluster/hosts.ini --ask-pass  # Ignore if play "Exchange Keys between master and nodes" is failed
+ansible-playbook rpi-k3/configure/03-set-sudo.yml -i inventory/my-cluster/hosts.ini --ask-pass --ask-become-pass
 ```
 
 
 Then ping your nodes:
 ```bash
-ansible -i inventory/hosts.ini -m ping all
+ansible -i inventory/my-cluster/hosts.ini -m ping all
 
 # If above lines do not work, then use command below per host:
 ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
@@ -68,25 +68,20 @@ ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 
 ## Step 4: Upgrade Pis with Ansible playbook
 ```bash
-ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/hosts.ini -t upgrade
+ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade
 ```
 
 ## Step 5: Install K3s using the following k3-ansible project
 ```bash
-git clone https://github.com/k3s-io/k3s-ansible.git
-# Copy and modify the inventory yml file to match your cluster setup and also adjust the version of K3S to install.
-cp inventory-sample.yml inventory.yml
-ansible-playbook k3s-ansible-master/site.yml -i inventory.yml
+git clone https://github.com/techno-tim/k3s-ansible/tree/master
 ```
 
-
-
-Test your cluster with:
+Step6: Test your cluster
 ```bash
 source get-k3s-token.bash <MASTER_IP> <your user>
 # Follow the instructions of the script in the output
 
-export KUBECONFIG=/workspace/kubeconfig
+export KUBECONFIG=~/.kube/config
 kubectl config use-context default
 kubectl cluster-info
 kubectl get nodes -o wide
