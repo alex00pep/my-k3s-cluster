@@ -21,12 +21,18 @@ if [[ -z "$master_user" ]]; then
     return
 fi
 
+context=$3
+
+if [[ -z "$context" ]]; then
+    echo "Third argument (kubernetes context) is missing. Please specify a context"
+    return
+fi
 
 k3sup install  \
     --user $master_user \
     --skip-install \
     --host $master_ip \
-    --context default \
+    --context $context \
     --merge \
     --local-path ~/.kube/config \
     --ssh-key ~/.ssh/id_rsa
