@@ -76,7 +76,9 @@ ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/my-cluster/host
 git clone https://github.com/techno-tim/k3s-ansible/tree/master
 ```
 
-Step6: Test your cluster
+Go back to the previous local repository
+
+Test your cluster
 ```bash
 source get-k3s-token.bash <MASTER_IP> <your user>
 # Follow the instructions of the script in the output
@@ -93,15 +95,15 @@ sudo k3s check-config  # Run this on the master server only
 sudo k3s crictl ps -a # Run it on the master server
 ```
 
-## Step 7: [Optional] Run some kubernetes tools 
+## Step 6: [Optional] Run some kubernetes tools 
 Open the kube-tools folder and follow the instructions
 
 
 ## Uninstalling K3s cluster
-To uninstall K3s from all servers and nodes, run:
+To uninstall K3s from all servers and nodes, run from second repository:
 
 ```bash
-ansible-playbook k3s-ansible-master/reset.yml -i inventory/hosts.ini
+ansible-playbook reset.yml -i inventory/my-cluster/hosts.ini
 ```
 
 # Special thanks to:
@@ -112,3 +114,5 @@ ansible-playbook k3s-ansible-master/reset.yml -i inventory/hosts.ini
 [k3sup](https://github.com/k3s-io/k3sup)
 
 [K3s-ansible](https://github.com/k3s-io/k3s-ansible)
+
+[TecnoTim's K3s-ansible](https://github.com/techno-tim/k3s-ansible)

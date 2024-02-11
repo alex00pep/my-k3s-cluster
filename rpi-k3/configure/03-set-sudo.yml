@@ -21,7 +21,7 @@
       ansible.builtin.group:
         name: sudo
         state: present
-
+          
     - name: Add sudoers users to sudo group
       ansible.builtin.user:
         name={{ ansible_user }}
@@ -30,3 +30,10 @@
         append=yes
         state=present
         create_home=yes
+
+    - name: Allow 'user' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%{{ ansible_user }}'
+        line: '%{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
