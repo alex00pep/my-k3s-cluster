@@ -1,4 +1,3 @@
-# Run with `ansible-playbook -i ansible-inventory.ini `pwd`/rpi-k3sconfig.yaml`
 - name: "Update your sources.list file to use Debian Bookworm"
   hosts: all
   gather_facts: no

@@ -32,9 +32,9 @@ ansible-playbook playbooks/configure/install_toolchain.yml -i inventory/my-clust
 ## Step 3: Copy SSH keys to Master and Worker nodes as authorized_keys and add the user to sudo group
 The RSA key files will be located at: ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
 ```bash
-ansible-playbook rpi-k3/configure/01-generate-rsa.yml -i inventory/my-cluster/hosts.ini
-ansible-playbook rpi-k3/configure/02-copy-rsa.yml -i inventory/my-cluster/hosts.ini --ask-pass  # Ignore if play "Exchange Keys between master and nodes" is failed
-ansible-playbook rpi-k3/configure/03-set-sudo.yml -i inventory/my-cluster/hosts.ini --ask-pass --ask-become-pass
+ansible-playbook playbooks/configure/01-generate-rsa.yml -i inventory/my-cluster/hosts.ini
+ansible-playbook playbooks/configure/02-copy-rsa.yml -i inventory/my-cluster/hosts.ini --ask-pass  # Ignore if play "Exchange Keys between master and nodes" is failed
+ansible-playbook playbooks/configure/03-set-sudo.yml -i inventory/my-cluster/hosts.ini --ask-pass --ask-become-pass
 ```
 
 
@@ -48,7 +48,7 @@ ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 
 ## Step 4: Upgrade Pis with Ansible playbook
 ```bash
-ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade
+ansible-playbook playbooks/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade
 ```
 
 ## Step 5: Install K3s using the following k3-ansible project
