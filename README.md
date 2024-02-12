@@ -1,5 +1,5 @@
-# My K3s cluster - Automated K3s setup on RaspberryPi
-Kubernetes cluster setup on Raspberry Pi
+# My K3s cluster - Automated K3s setup
+Kubernetes cluster setup
 
 
 ## Step 1: Use an isolated container based on Ansible as your management station and install the ansible.posix collection
@@ -19,33 +19,13 @@ docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host -v %cd%:
 # Bash (Linux)
 docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd`:/workspace ansiblecontainer
 ```
-## Step 2: Generate your inventory/youhosts.ini with the IP addresses you need. Second, edit inventory/my-cluster/hosts.ini to match the system information gathered:
+## Step 2: Generate your inventory hosts.ini with the IP addresses you need. Second, edit inventory/my-cluster/hosts.ini to match the system information gathered:
 ```bash
 cp -R inventory/sample inventory/my-cluster
 ```
-Install sshpass and kubectl programs using the package manager for Linux distribution. Example for Debian and Ubuntu
+Install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
 ```bash
-sudo apt install sshpass
-```
-Install Kubectl
-```bash
-sudo apt-get update
-# apt-transport-https may be a dummy package; if so, you can skip that package
-sudo apt-get install -y apt-transport-https ca-certificates curl
-# Download the public signing key for the Kubernetes package repositories
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get update
-sudo apt-get install -y kubectl
-```
-
-Install K3sup
-```
-curl -sLS https://get.k3sup.dev | sh
-sudo install k3sup /usr/local/bin/
-
-k3sup --help
+ansible-playbook playbooks/configure/install_toolchain.yml -i inventory/my-cluster/hosts.ini
 ```
 
 
@@ -78,13 +58,15 @@ git clone https://github.com/techno-tim/k3s-ansible/tree/master
 
 Go back to the previous local repository
 
-Test your cluster
+Test your cluster. The context is an alias for your kubernetes cluster
 ```bash
-source get-k3s-token.bash <MASTER_IP> <your user>
+source get-k3s-token.bash <MASTER_IP> <your user> <context>
+
+
 # Follow the instructions of the script in the output
 
 export KUBECONFIG=~/.kube/config
-kubectl config use-context default
+kubectl config use-context <context>
 kubectl cluster-info
 kubectl get nodes -o wide
 kubectl get all -A -o wide

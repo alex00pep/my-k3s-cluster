@@ -1,0 +1,49 @@
+---
+- name: Install kubectl using apt
+  connection: local
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - sshpass
+
+    - name: Download public signing key for Kubernetes package repositories
+      shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        executable: /bin/bash
+
+    - name: Add Kubernetes apt repository
+      shell: echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+      args:
+        executable: /bin/bash
+
+    - name: Update apt package cache after adding repository
+      apt:
+        update_cache: yes
+
+    - name: Install kubectl
+      apt:
+        name: kubectl
+        state: present
+
+    - name: Download k3sup installer script
+      get_url:
+        url: https://get.k3sup.dev
+        dest: /tmp/install_k3sup.sh
+
+    - name: Run k3sup installer script
+      shell: sh /tmp/install_k3sup.sh
+      args:
+        creates: /usr/local/bin/k3sup
+
+    - name: Move k3sup binary to /usr/local/bin
+      command: sudo install /tmp/k3sup /usr/local/bin/k3sup
+      args:
+        creates: /usr/local/bin/k3sup
