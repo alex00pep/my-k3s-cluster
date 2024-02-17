@@ -17,9 +17,9 @@ echo \
 sudo apt-get update
 
 sudo rm -rf /var/lib/docker/
-
+sudo rm -rf /var/lib/containerd
 
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-sudo usermode -aG docker $USER
+sudo usermod -aG docker $USER
