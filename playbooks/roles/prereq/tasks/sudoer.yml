@@ -1,0 +1,13 @@
+---
+- name: Ensure sudoers.d directory exists
+  ansible.builtin.file:
+    path: /etc/sudoers.d
+    state: directory
+    mode: '0755'
+
+- name: Create NOPASSWD file for ansible user
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/010_{{ ansible_user }}-nopasswd"
+    content: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL\n"
+    mode: '0440'
+    validate: '/usr/sbin/visudo -cf %s'

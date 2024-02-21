@@ -1,0 +1,12 @@
+- name: Include SSH keys tasks
+  include_tasks: sshkeys.yml
+
+- name: Include sudoers tasks
+  include_tasks: sudoer.yml
+
+# - name: Include copy hostnames tasks
+#   include_tasks: copy_hostnames.yml
+
+- name: Include install packages tasks
+  include_tasks: install_packages.yml
+

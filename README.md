@@ -1,8 +1,17 @@
 # My K3s cluster - Automated K3s setup
 Kubernetes cluster setup
 
+Welcome to my K3s repository! This space is dedicated to documenting the setup and automatic build/rebuild processes of my personal HomeLab. The primary goal is to enable anyone (including my future self) to check out this repository, create the necessary .env file, and have everything up and running smoothly with minimal manual intervention.
 
-## Step 1: Use an isolated container based on Ansible as your management station and install the ansible.posix collection
+
+Design principles:
+1. Simple to spin up and tear down.
+2. Security-first approach with NetworkSecurityPolicies to allow for isolation and CrowdSec software to block malintentioned requests to the ingress objects.
+3. Automated certificate management for all ingresses, with resilient certificate issuers.
+4. Monitoring from the first day for all services and including the host.
+
+
+## Pre-requisites
 
 ```bash
 docker build --pull --rm -f "Dockerfile" -t ansiblecontainer:latest "."
@@ -19,17 +28,25 @@ docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host -v %cd%:
 # Bash (Linux)
 docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd`:/workspace ansiblecontainer
 ```
-## Step 2: Generate your inventory hosts.ini with the IP addresses you need. Second, edit inventory/my-cluster/hosts.ini to match the system information gathered:
+## One-shot K3s provisioning script
+Run the setup.sh script which grabs the env information and generates the inventory file on the fly, then runs the provisioning using Ansible
+```
+bash setup.sh
+```
+
+## A more involved setup, for more experience or tech-savvy people.
+
+### Step 1: Generate your Ansible inventory hosts.ini with the IP addresses you need. Second, edit inventory/my-cluster/hosts.ini to match the system information gathered:
 ```bash
 cp -R inventory/sample inventory/my-cluster
 ```
-Install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
+Run below line and it will install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
 ```bash
 ansible-playbook playbooks/configure/install_toolchain.yml -i inventory/my-cluster/hosts.ini
 ```
 
 
-## Step 3: Copy SSH keys to Master and Worker nodes as authorized_keys and add the user to sudo group
+### Step 2: Copy SSH keys to Master and Worker nodes as authorized_keys and add the user to sudo group
 The RSA key files will be located at: ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
 ```bash
 ansible-playbook playbooks/configure/01-generate-rsa.yml -i inventory/my-cluster/hosts.ini
@@ -46,12 +63,12 @@ ansible -i inventory/my-cluster/hosts.ini -m ping all
 ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 ```
 
-## Step 4: Upgrade Pis with Ansible playbook
+### Step 3: Upgrade OS 
 ```bash
 ansible-playbook playbooks/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade
 ```
 
-## Step 5: Install K3s using the following k3-ansible project
+### Step 4: Install K3s using the following k3-ansible project
 ```bash
 git clone https://github.com/techno-tim/k3s-ansible/tree/master
 ```
@@ -77,14 +94,11 @@ sudo k3s check-config  # Run this on the master server only
 sudo k3s crictl ps -a # Run it on the master server
 ```
 
-## Step 6: [Optional] Run some kubernetes tools 
-Open the kube-tools folder and follow the instructions
-
-
 ## Uninstalling K3s cluster
 To uninstall K3s from all servers and nodes, run from second repository:
 
 ```bash
+cd 
 ansible-playbook reset.yml -i inventory/my-cluster/hosts.ini
 ```
 

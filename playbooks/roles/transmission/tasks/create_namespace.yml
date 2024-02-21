@@ -1,0 +1,15 @@
+---
+- name: Check if 'MediaMaven' Namespace Exists
+  community.kubernetes.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "MediaMaven"
+  register: ns
+
+- name: Create 'MediaMaven' Namespace if it does not exist
+  community.kubernetes.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "MediaMaven"
+    state: present
+  when: ns.resources | length == 0

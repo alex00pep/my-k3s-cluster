@@ -1,0 +1,41 @@
+---
+- name: Gather Hostnames and IPs
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Get hostname
+      ansible.builtin.command: hostname
+      register: hostname
+
+    - name: Set fact for hostname and ansible_host
+      ansible.builtin.set_fact:
+        host_details: "{{ host_details | default([]) + [{ 'hostname': hostname.stdout, 'ip': ansible_host }] }}"
+
+- name: Update /etc/hosts on All Nodes
+  hosts: all
+  tasks:
+    - name: Gather host details from all hosts
+      ansible.builtin.set_fact:
+        all_host_details: "{{ groups['all'] | map('extract', hostvars, 'host_details') | select('defined') | flatten }}"
+      run_once: true
+
+    - name: Debug - Print host details if available
+      debug:
+        msg: "Host details for {{ inventory_hostname }}: {{ hostvars[inventory_hostname]['host_details'] }}"
+      when: hostvars[inventory_hostname]['host_details'] is defined
+
+    - name: Debug - Notify if host details are missing
+      debug:
+        msg: "host_details is not defined for {{ inventory_hostname }}"
+      when: hostvars[inventory_hostname]['host_details'] is not defined
+
+    - name: Check and Update /etc/hosts with all Hostnames and IPs
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^(.*){{ item.hostname }}$'
+        line: "{{ item.ip }} {{ item.hostname }}"
+        state: present
+      loop: "{{ all_host_details }}"
+      when: all_host_details is defined
+      become: true
+      

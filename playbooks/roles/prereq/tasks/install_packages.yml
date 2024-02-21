@@ -1,0 +1,9 @@
+---
+- name: Install apt-transport-https, ca-certificates, and curl
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+    state: present
+    update_cache: yes  # Update the repository cache before the install

@@ -1,0 +1,24 @@
+---
+# Ensure SSH Keys are Set Up
+- name: Check if .ssh directory exists and create it if not
+  file:
+    path: "~/.ssh"
+    state: directory
+    mode: '0700'  # Set the directory permissions to be read, write, and execute for the owner only
+  
+- name: Check if SSH key is present on the remote host
+  ansible.builtin.stat:
+    path: "~/.ssh/authorized_keys"
+  register: ssh_key_check
+
+- name: Display message if SSH key is already present
+  ansible.builtin.debug:
+    msg: "SSH key is already set up on this host."
+  when: ssh_key_check.stat.exists
+
+- name: Copy SSH public key to remote host
+  ansible.builtin.copy:
+    src: "{{ local_ssh_public_key }}"
+    dest: "~/.ssh/authorized_keys"
+    mode: '0600'
+  when: not ssh_key_check.stat.exists

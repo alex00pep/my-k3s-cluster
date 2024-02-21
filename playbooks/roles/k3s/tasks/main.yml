@@ -1,0 +1,12 @@
+- name: Include install packages tasks
+  include_tasks: install_packages.yml
+
+- name: Include install kubectl tasks
+  include_tasks: install_kubectl.yml
+
+- name: Include install k3sup tasks
+  include_tasks: install_k3sup.yml
+
+- name: Include install helm tasks
+  include_tasks: install_helm.yml
+  

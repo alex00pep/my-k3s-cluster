@@ -1,0 +1,35 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600  # Optional: only update the cache if it's older than 1 hour
+
+- name: Install necessary packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+    state: present
+
+- name: Download Kubernetes signing key
+  ansible.builtin.get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+    dest: /tmp/kubernetes-release.key
+
+- name: Add Kubernetes signing key
+  ansible.builtin.apt_key:
+    file: /tmp/kubernetes-release.key
+    keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Add Kubernetes repository
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /'
+    filename: kubernetes
+    state: present
+    update_cache: yes
+
+- name: Install kubectl
+  ansible.builtin.apt:
+    name: kubectl
+    state: present

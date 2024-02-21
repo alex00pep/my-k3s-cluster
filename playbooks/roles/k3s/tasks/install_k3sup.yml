@@ -1,0 +1,16 @@
+---
+- name: Download k3sup installer script
+  ansible.builtin.get_url:
+    url: https://get.k3sup.dev
+    dest: /tmp/get_k3sup.sh
+    mode: '0755'
+
+- name: Execute k3sup installer script
+  ansible.builtin.shell: sh /tmp/get_k3sup.sh
+  args:
+    creates: /usr/local/bin/k3sup  # This prevents re-running if k3sup is already installed
+
+- name: Ensure k3sup is installed in /usr/local/bin
+  ansible.builtin.command: sudo install /root/.k3sup/bin/k3sup /usr/local/bin/
+  args:
+    creates: /usr/local/bin/k3sup  # This prevents re-running the install command if k3sup is already installed
