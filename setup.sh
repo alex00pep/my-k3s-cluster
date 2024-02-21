@@ -91,7 +91,6 @@ else
 fi
 
 
-cd playbooks
 echo "Initializing localhost..."
 ansible-playbook homelab.yml
 
