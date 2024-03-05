@@ -27,5 +27,5 @@ retrieve_k3s_cluster_config() {
         --ssh-key ~/.ssh/id_rsa
 }
 
-first_master_ip=$(echo $K3S_VIP | cut -d',' -f1)
+first_master_ip=$(echo $K3S_MASTERS | cut -d',' -f1)
 retrieve_k3s_cluster_config "$first_master_ip" "${K3S_USERNAME}" "${K3S_CONTEXT}"
