@@ -146,25 +146,28 @@ if [ "${K3S_ENABLED}" == "true" ]; then
     echo "ANSIBLE Group Vars created."
     # update Ansible User in Group Vars
     echo "Updating Ansible User in Group Vars..."
-    sed -i "s/{{ ansible_user }}/${ANSIBLE_USER}/g" "${ANSIBLE_INVENTORY_PATH}/group_vars/all.yml"
+    sed -i "s/ansibleuser/${ANSIBLE_USER}/g" "${ANSIBLE_INVENTORY_PATH}/group_vars/all.yml"
+    sed -i "s|Your/Timezone|${SYSTEM_TZ}|g" "${ANSIBLE_INVENTORY_PATH}/group_vars/all.yml"
+    echo "master_ip: \"{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}\"" >> "${ANSIBLE_INVENTORY_PATH}/group_vars/all.yml"
     echo "Ansible User updated in Group Vars."
+    
     # Initialize K3s
-    echo "Initializing K3s..."
-    ansible-playbook -i "${ANSIBLE_INVENTORY_PATH}/${ANSIBLE_INVENTORY_FILE}" k3s-ansible/site.yml
-    echo "K3s initialized."
-    echo "retrieving k3s cluster config..."
-    # Extract the first IP address from K3S_MASTERS
-    first_master_ip=$(echo $K3S_MASTERS | cut -d',' -f1)
-    retrieve_k3s_cluster_config "$first_master_ip" "${K3S_USERNAME}" "${K3S_CONTEXT}"
-    echo "k3s cluster config retrieved."
-    echo "exporting k3s cluster config..."
-    export KUBECONFIG=~/.kube/config
-    echo "k3s cluster config exported."
-    kubectl config use-context "${K3S_CONTEXT}"
-    echo "k3s cluster info:"
-    kubectl cluster-info
-    echo "k3s nodes:"
-    kubectl get nodes -o wide
+    # echo "Initializing K3s..."
+    # ansible-playbook -i "${ANSIBLE_INVENTORY_PATH}/${ANSIBLE_INVENTORY_FILE}" k3s-ansible/site.yml
+    # echo "K3s initialized."
+    # echo "retrieving k3s cluster config..."
+    # # Extract the first IP address from K3S_MASTERS
+    # first_master_ip=$(echo $K3S_MASTERS | cut -d',' -f1)
+    # retrieve_k3s_cluster_config "$first_master_ip" "${K3S_USERNAME}" "${K3S_CONTEXT}"
+    # echo "k3s cluster config retrieved."
+    # echo "exporting k3s cluster config..."
+    # export KUBECONFIG=~/.kube/config
+    # echo "k3s cluster config exported."
+    # kubectl config use-context "${K3S_CONTEXT}"
+    # echo "k3s cluster info:"
+    # kubectl cluster-info
+    # echo "k3s nodes:"
+    # kubectl get nodes -o wide
 
 else
     echo "K3s is not enabled."

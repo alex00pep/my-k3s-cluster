@@ -28,19 +28,21 @@ docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host -v %cd%:
 # Bash (Linux)
 docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd`:/workspace ansiblecontainer
 ```
-## One-shot K3s provisioning script
-Run the setup.sh script which grabs the env information and generates the inventory file on the fly, then runs the provisioning using Ansible
-```
-bash setup.sh
-```
 
-## A more involved setup, for more experience or tech-savvy people.
+For more information on env variables as well as inventory group variables please look at:
+git clone https://github.com/techno-tim/k3s-ansible/tree/master
 
-### Step 1: Generate your Ansible inventory hosts.ini with the IP addresses you need. Second, edit inventory/my-cluster/hosts.ini to match the system information gathered:
+## Setup
+### Generate your env variable file and configure installation variables 
+Including system_timezone, please update all variables needed, run setup.sh and generate the inventory file based on it
 ```bash
-cp -R inventory/sample inventory/my-cluster
+cp example.env .env
+source setup.sh
 ```
-Run below line and it will install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
+
+### Step 1: Edit inventory/my-cluster/group_vars/all.yml to match the system information gathered.
+
+With your Ansible inventory file generated inventory/my-cluster/hosts.ini with the IP addresses you need, and the variables ready run below line and it will install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
 ```bash
 ansible-playbook playbooks/configure/install_toolchain.yml -i inventory/my-cluster/hosts.ini
 ```
@@ -54,7 +56,6 @@ ansible-playbook playbooks/configure/02-copy-rsa.yml -i inventory/my-cluster/hos
 ansible-playbook playbooks/configure/03-set-sudo.yml -i inventory/my-cluster/hosts.ini --ask-pass --ask-become-pass
 ```
 
-
 Then ping your nodes:
 ```bash
 ansible -i inventory/my-cluster/hosts.ini -m ping all
@@ -65,19 +66,16 @@ ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 
 ### Step 3: Upgrade OS 
 ```bash
-ansible-playbook playbooks/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade
+ansible-playbook playbooks/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade,reboot
 ```
 
-### Step 4: Install K3s using the following k3-ansible project
+### Step 4: Install K3s cluster and test is successfully running.
 ```bash
-git clone https://github.com/techno-tim/k3s-ansible/tree/master
+ansible-playbook k3s-ansible/site.yml -i inventory/my-cluster/hosts.ini
 ```
-
-Go back to the previous local repository
-
 Test your cluster. The context is an alias for your kubernetes cluster
 ```bash
-source get-k3s-token.bash <MASTER_IP> <your user> <context>
+source get-k3s-token.bash
 
 
 # Follow the instructions of the script in the output
@@ -98,8 +96,7 @@ sudo k3s crictl ps -a # Run it on the master server
 To uninstall K3s from all servers and nodes, run from second repository:
 
 ```bash
-cd 
-ansible-playbook reset.yml -i inventory/my-cluster/hosts.ini
+ansible-playbook k3s-ansible/reset.yml -i inventory/my-cluster/hosts.ini
 ```
 
 # Special thanks to:

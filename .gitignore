@@ -160,7 +160,6 @@ cython_debug/
 # Github excludes
 k3s-ansible/
 k3sup/
-k3sup
 kubeconfig
 inventory/
 k3s-ansible/

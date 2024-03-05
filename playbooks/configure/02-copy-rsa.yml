@@ -1,6 +1,6 @@
 ---
 # Reference docs: https://www.middlewareinventory.com/blog/ansible-ssh-key-exchange/
-- name: Copy SSH Key into hosts from local machine
+- name: Copy SSH Key into from local machine cluster hosts 
   hosts: all
   gather_facts: no
   vars:
@@ -54,7 +54,7 @@
       tags: [ ssh ]
       fetch: 
         src: "~/.ssh/id_rsa.pub"
-        dest: "{{ playbook_dir | dirname | dirname }}/buffer/{{ansible_ssh_host}}-id_rsa.pub"
+        dest: "{{ playbook_dir | dirname | dirname }}/buffer/{{inventory_hostname}}-id_rsa.pub"
         flat: yes
       
 
@@ -64,7 +64,7 @@
         user: "{{ ansible_user }}"
         state: present
         key: "{{ lookup('file','{{ playbook_dir | dirname | dirname }}/buffer/{{item}}-id_rsa.pub')}}"
-      when: " item != ansible_ssh_host "
+      when: " item != inventory_hostname "
       with_items:
         - "{{ groups['all'] }}"    
 
