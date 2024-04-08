@@ -38,40 +38,44 @@ Including system_timezone, please update all variables needed, run setup.sh and 
 ```bash
 cp example.env .env
 source setup.sh
+
+CLUSTER=cluster01
 ```
 
-### Step 1: Edit inventory/my-cluster/group_vars/all.yml to match the system information gathered.
+### Step 1: Edit inventory/${CLUSTER}/group_vars/all.yml to match the system information gathered.
 
-With your Ansible inventory file generated inventory/my-cluster/hosts.ini with the IP addresses you need, and the variables ready run below line and it will install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
+With your Ansible inventory file generated inventory/${CLUSTER}/hosts.ini with the IP addresses you need, and the variables ready run below line and it will install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
 ```bash
-ansible-playbook playbooks/configure/install_toolchain.yml -i inventory/my-cluster/hosts.ini
+
+ansible-playbook playbooks/configure/install_toolchain.yml -i inventory/${CLUSTER}/hosts.ini
 ```
 
 
 ### Step 2: Copy SSH keys to Master and Worker nodes as authorized_keys and add the user to sudo group
 The RSA key files will be located at: ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
 ```bash
-ansible-playbook playbooks/configure/01-generate-rsa.yml -i inventory/my-cluster/hosts.ini
-ansible-playbook playbooks/configure/02-copy-rsa.yml -i inventory/my-cluster/hosts.ini --ask-pass  # Ignore if play "Exchange Keys between master and nodes" is failed
-ansible-playbook playbooks/configure/03-set-sudo.yml -i inventory/my-cluster/hosts.ini --ask-pass --ask-become-pass
+
+ansible-playbook playbooks/configure/01-generate-rsa.yml -i inventory/${CLUSTER}/hosts.ini
+ansible-playbook playbooks/configure/02-copy-rsa.yml -i inventory/${CLUSTER}/hosts.ini --ask-pass  # Ignore if play "Exchange Keys between master and nodes" is failed
+ansible-playbook playbooks/configure/03-set-sudo.yml -i inventory/${CLUSTER}/hosts.ini --ask-pass --ask-become-pass
 ```
 
 Then ping your nodes:
 ```bash
-ansible -i inventory/my-cluster/hosts.ini -m ping all
+ansible -i inventory/${CLUSTER}/hosts.ini -m ping all
 
 # If above lines do not work, then use command below per host:
-ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
+ssh-copy-id -i ~/.ssh/id_rsa -f <your_user>>@<your_pi_host>
 ```
 
 ### Step 3: Upgrade OS 
 ```bash
-ansible-playbook playbooks/configure/04-os-config.yaml -i inventory/my-cluster/hosts.ini -t upgrade,reboot
+ansible-playbook playbooks/configure/04-os-config.yaml -i inventory/${CLUSTER}/hosts.ini -t security,upgrade
 ```
 
 ### Step 4: Install K3s cluster and test is successfully running.
 ```bash
-ansible-playbook k3s-ansible/site.yml -i inventory/my-cluster/hosts.ini
+ansible-playbook k3s-ansible/site.yml -i inventory/${CLUSTER}/hosts.ini
 ```
 Test your cluster. The context is an alias for your kubernetes cluster
 ```bash
@@ -96,7 +100,7 @@ sudo k3s crictl ps -a # Run it on the master server
 To uninstall K3s from all servers and nodes, run from second repository:
 
 ```bash
-ansible-playbook k3s-ansible/reset.yml -i inventory/my-cluster/hosts.ini
+ansible-playbook k3s-ansible/reset.yml -i inventory/${CLUSTER}/hosts.ini
 ```
 
 # Special thanks to:

@@ -49,6 +49,14 @@
         state=present
         backup=yes
       tags: [ security ]
+    - name: Eliminate SSH authorized keys for root
+      lineinfile:
+        dest=/etc/ssh/sshd_config
+        regexp='^PermitRootLogin'
+        line="PermitRootLogin no"
+        state=present
+        backup=yes
+      tags: [ security ]
       
     - name: "Setup script to delete logs, update repo list and dist upgrade"
       copy:
