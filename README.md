@@ -1,7 +1,7 @@
-# My K3s cluster - Automated K3s setup
+# My RPI-K3s cluster - Automated RPI-K3s setup
 Kubernetes cluster setup
 
-Welcome to my K3s repository! This space is dedicated to documenting the setup and automatic build/rebuild processes of my personal HomeLab. The primary goal is to enable anyone (including my future self) to check out this repository, create the necessary .env file, and have everything up and running smoothly with minimal manual intervention.
+Welcome to my RPI K3s repository! This space is dedicated to documenting the setup and automatic build/rebuild processes of my personal HomeLab. The primary goal is to enable anyone (including my future self) to check out this repository, create the necessary .env file, and have everything up and running smoothly with minimal manual intervention.
 
 
 Design principles:
