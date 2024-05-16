@@ -23,10 +23,7 @@ docker run -it --entrypoint=/bin/bash --rm -w /workspace --network=host  -v `pwd
 ```bash
 cp -R inventory/sample.ini inventory/hosts.ini
 ```
-Install sshpass and kubectl programs using the package manager for Linux distribution. Example for Debian and Ubuntu
-```bash
-sudo apt install sshpass
-```
+
 Install Kubectl
 ```bash
 sudo apt-get update
@@ -68,7 +65,7 @@ ssh-copy-id -i ~/.ssh/id_rsa -f pi@<your_pi_host>
 
 ## Step 4: Upgrade Pis with Ansible playbook
 ```bash
-ansible-playbook rpi-k3/configure/04-os-config.yaml -i inventory/hosts.ini -t upgrade
+ansible-playbook rpi-k3/configure/05-os-config.yaml -i inventory/hosts.ini -t upgrade
 ```
 
 ## Step 5: Install K3s using the following k3-ansible project

@@ -1,6 +1,6 @@
 ---
 - name: "Update your sources.list file to update Debian Bookworm (NOT RECOMMENDED, instead flash a brand new boot drive with the desired distro)"
-  hosts: rpi-pn3.local
+  hosts: all
   gather_facts: no
   become: true
   become_user: root
