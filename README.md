@@ -42,7 +42,7 @@ source setup.sh
 CLUSTER=cluster01
 ```
 
-### Step 1: Edit inventory/${CLUSTER}/group_vars/all.yml to match the system information gathered.
+### Step 1: Edit inventory/${CLUSTER}/hosts.ini to match the system information gathered.
 
 With your Ansible inventory file generated inventory/${CLUSTER}/hosts.ini with the IP addresses you need, and the variables ready run below line and it will install sshpass, kubectl, k3s and other programs for Debian and Ubuntu.
 ```bash
