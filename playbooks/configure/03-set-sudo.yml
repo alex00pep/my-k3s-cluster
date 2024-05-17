@@ -21,7 +21,50 @@
       ansible.builtin.group:
         name: sudo
         state: present
-          
+    
+    - name: Check if user exists
+      command: id {{ ansible_user }}
+      register: user_check
+      ignore_errors: true
+
+    - name: Display user information
+      debug:
+        msg: "User '{{ ansible_user }}' exists."
+      when: user_check.rc == 0
+
+    - name: Display error message if user doesn't exist
+      debug:
+        msg: "User '{{ ansible_user }}' does not exist."
+      when: user_check.rc != 0
+
+    - name: Create principal user's group
+      ansible.builtin.group:
+        name: "{{ ansible_user }}"
+        state: present
+        
+    - name: Removing the user {{ ansible_user }}
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"  # Replace with the username you want to delete
+        state: absent
+        remove: yes
+        force: yes
+      when: user_check.rc == 0
+
+    - name: Adding the user {{ ansible_user }}
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"  # Replace with the username you want to create
+        state: present
+        password: "{{ 'recallsvnxe3rk6sz' | password_hash('sha512') }}"
+        group: "{{ ansible_user }}"
+        shell: /bin/bash  # Specify the shell for the user (optional)
+        comment: "Created by Ansible"  # Add a comment for the user (optional)
+        createhome: yes  # Create the user's home directory (optional
+        expires: -1
+        password_expire_min: 30 # <min-days>
+        password_expire_max: 180 # <max-days>
+      when: user_check.rc != 0
+
+
     - name: Add sudoers users to sudo group
       ansible.builtin.user:
         name={{ ansible_user }}

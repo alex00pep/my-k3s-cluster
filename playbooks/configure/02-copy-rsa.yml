@@ -8,13 +8,13 @@
   tasks:
     - name: Create ~/.ssh directory remotely
       file:
-        path: "/home/{{ ansible_user }}/.ssh/"
+        path: "/home/{{ ansible_ssh_user }}/.ssh/"
         state: directory
-        owner: "{{ ansible_user }}"
+        owner: "{{ ansible_ssh_user }}"
         mode: "u=rwx,g=rx,o="
     - name: accept new hosts' ssh fingerprints
       tags: [ ssh, fingerprints ]
-      shell: ssh-keyscan -H {{ ansible_ssh_host }} >> /home/{{ ansible_user }}/.ssh/known_hosts  
+      shell: ssh-keyscan -H {{ ansible_ssh_host }} >> ~/.ssh/known_hosts  
     
     - name: Delete all SSH Known Hosts and authorized SSH keys from all nodes
       tags: [ ssh ]
@@ -24,7 +24,7 @@
     - name: Authorize local SSH Key into remote hosts
       tags: [ ssh ]
       ansible.posix.authorized_key:
-        user: "{{ ansible_user }}"
+        user: "{{ ansible_ssh_user }}"
         state: present
         key: "{{ lookup('file',  lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
         manage_dir: yes
@@ -61,7 +61,7 @@
     - name: Copy each others SSH public key
       tags: [ ssh ]
       authorized_key:
-        user: "{{ ansible_user }}"
+        user: "{{ ansible_ssh_user }}"
         state: present
         key: "{{ lookup('file','{{ playbook_dir | dirname | dirname }}/buffer/{{item}}-id_rsa.pub')}}"
       when: " item != inventory_hostname "
