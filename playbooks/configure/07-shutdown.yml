@@ -1,0 +1,17 @@
+---
+- name: Shutdown Raspberry Pi devices
+  hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Shutdown the device
+      command: /sbin/shutdown -h now
+      ignore_errors: yes
+      async: 1
+      poll: 0
+      notify: Log shutdown initiation
+
+  handlers:
+    - name: Log shutdown initiation
+      local_action: copy content="{{ inventory_hostname }} shutdown initiated." dest="./shutdown.log"
+
