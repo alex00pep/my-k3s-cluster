@@ -1,0 +1,2 @@
+local_ssh_public_key: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa"
+#local_ssh_public_key: "{{ lookup('env', 'KEY_FILE') | default('$HOME/.ssh/id_rsa', true) }}"

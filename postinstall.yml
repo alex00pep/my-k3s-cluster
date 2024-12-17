@@ -1,0 +1,42 @@
+---
+
+- name: Retrieve K3s cluster configuration
+  hosts: localhost
+  gather_facts: no
+  vars:
+    master_ip: "{{ lookup('env', 'K3S_MASTERS') }}"
+    master_user: "{{ lookup('env', 'K3S_USERNAME') }}"
+    context: "{{ lookup('env', 'K3S_CONTEXT') }}"
+    ssh_key_path: "~/.ssh/id_rsa"
+    kube_config_path: "~/.kube/config"
+    k3s_enabled: "{{ lookup('env', 'K3S_ENABLED') | bool }}"
+  tasks:
+    - name: Ensure .kube directory exists locally
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      when: k3s_enabled
+
+    - name: Ensure kube config file exists locally
+      ansible.builtin.file:
+        path: "{{ kube_config_path }}"
+        state: touch
+      delegate_to: localhost
+      when: k3s_enabled
+
+    - name: Check if context exists in kubectl
+      shell: kubectl config get-contexts -o name | grep -w {{ context }}
+      register: context_check
+      ignore_errors: true
+
+    - name: Remove context if it exists
+      shell: kubectl config delete-context {{ context }}
+      when: context_check.rc == 0
+
+    - name: Retrieve K3s cluster configuration from master
+      ansible.builtin.command:
+        cmd: "k3sup install --user {{ master_user }} --skip-install --host {{ master_ip }} --context {{ context }} --local-path {{ kube_config_path }} "
+      when: k3s_enabled
+
