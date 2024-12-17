@@ -5,7 +5,7 @@
     path: "~/.ssh"
     state: directory
     mode: '0700'  # Set the directory permissions to be read, write, and execute for the owner only
-  
+
 - name: Check if SSH key is present on the remote host
   ansible.builtin.stat:
     path: "~/.ssh/authorized_keys"
@@ -16,9 +16,9 @@
     msg: "SSH key is already set up on this host."
   when: ssh_key_check.stat.exists
 
-- name: Copy SSH public key to remote host
-  ansible.builtin.copy:
-    src: "{{ local_ssh_public_key }}"
-    dest: "~/.ssh/authorized_keys"
-    mode: '0600'
-  when: not ssh_key_check.stat.exists
+- name: Add id_rsa.pub key to authorized_keys file
+  ansible.builtin.authorized_key:
+    user: "{{ ansible_user }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    state: present
+

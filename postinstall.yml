@@ -1,4 +1,12 @@
 ---
+- name: Set global condition based on K3S_ENABLED environment variable
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Determine if K3S is enabled
+      set_fact:
+        k3s_enabled: "{{ lookup('env', 'K3S_ENABLED') == 'true' }}"
+      run_once: true
 
 - name: Retrieve K3s cluster configuration
   hosts: localhost
@@ -13,7 +21,7 @@
   tasks:
     - name: Ensure .kube directory exists locally
       ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/.kube"
+        path: "{{ lookup('env', 'HOME') }}/.kube"
         state: directory
         mode: '0755'
       delegate_to: localhost

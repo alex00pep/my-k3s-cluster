@@ -218,7 +218,7 @@ ansible-playbook -i $INVENTORY_FILE preinstall.yml --ask-pass --ask-become-pass
 # Install K3s with TechnoTim's repo
 cd k3s-ansible
 ansible-galaxy collection install -r ./collections/requirements.yml
-ansible-playbook -i $INVENTORY_FILE site.yml --ask-pass --ask-become-pass
+ansible-playbook -i $INVENTORY_FILE site.yml
 
 
 # Post install
